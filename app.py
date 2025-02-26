@@ -25,6 +25,7 @@ class MovimientoInventario(db.Model):
 class Venta(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     producto_id = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
+    producto = db.relationship('Producto', backref='ventas', lazy=True)  # Relación con Producto
     cantidad_vendida = db.Column(db.Integer, nullable=False)
     fecha_venta = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
     precio_venta_unitario = db.Column(db.Float, nullable=False)
@@ -95,7 +96,10 @@ def ventas():
     
     productos = Producto.query.all()
     ventas = Venta.query.all()
+    
     return render_template('ventas.html', productos=productos, ventas=ventas)
+
+
 
 @app.route('/ganancias')
 def ganancias():

@@ -16,7 +16,12 @@
     <h2>Historial de Ventas</h2>
     <ul>
     {% for venta in ventas %}
-        <li>Producto ID: {{ venta.producto_id }} - Cantidad Vendida: {{ venta.cantidad_vendida }} - Fecha: {{ venta.fecha_venta }}</li>
+        <li>
+            ID Venta: {{ venta.id }} - 
+            Producto: {{ venta.producto.nombre }} - 
+            Cantidad Vendida: {{ venta.cantidad_vendida }} - 
+            Fecha: {{ venta.fecha_venta }}
+        </li>
     {% endfor %}
     </ul>
 {% endblock %}
