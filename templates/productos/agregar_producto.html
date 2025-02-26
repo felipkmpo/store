@@ -1,7 +1,7 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <h1>Productos</h1>
+    <h1>Agregar Nuevo Producto</h1>
     <form method="post">
         <div class="form-group">
             <label for="nombre">Nombre</label>
@@ -27,17 +27,10 @@
             <label for="proveedor">Proveedor</label>
             <input type="text" class="form-control" id="proveedor" name="proveedor" required>
         </div>
+        <div class="form-group">
+            <label for="umbral_alerta">Umbral de Alerta</label>
+            <input type="number" class="form-control" id="umbral_alerta" name="umbral_alerta" required>
+        </div>
         <button type="submit" class="btn btn-primary">Agregar Producto</button>
     </form>
-
-    <h2>Lista de Productos</h2>
-    <ul class="list-group">
-        {% for producto in productos %}
-            <li class="list-group-item">
-                {{ producto.nombre }} - Stock: {{ producto.stock_disponible }}
-                <a href="{{ url_for('editar_producto', id=producto.id) }}" class="btn btn-sm btn-warning">Editar</a>
-                <a href="{{ url_for('agregar_stock', id=producto.id) }}" class="btn btn-sm btn-info">Agregar Stock</a>
-            </li>
-        {% endfor %}
-    </ul>
 {% endblock %}

@@ -1,10 +1,12 @@
 {% extends 'index.html' %}
 
-{% block contenido %}
+{% block content %}
     <h1>Alertas de Stock Bajo</h1>
-    <ul>
-    {% for alerta in alertas %}
-        <li>{{ alerta.nombre }} - Stock: {{ alerta.stock_disponible }}</li>
-    {% endfor %}
+    <ul class="list-group">
+        {% for alerta in alertas %}
+            <li class="list-group-item">
+                {{ alerta.nombre }} - Stock: {{ alerta.stock_disponible }}
+            </li>
+        {% endfor %}
     </ul>
 {% endblock %}

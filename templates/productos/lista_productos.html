@@ -1,0 +1,32 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <h1>Lista de Productos</h1>
+    <a href="{{ url_for('agregar_producto') }}" class="btn btn-primary mb-3">Agregar Nuevo Producto</a>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio de Venta</th>
+                <th>Stock Disponible</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.categoria }}</td>
+                    <td>{{ producto.precio_venta }}</td>
+                    <td>{{ producto.stock_disponible }}</td>
+                    <td>
+                         <a href="{{ url_for('editar_producto', id=producto.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                         <a href="{{ url_for('agregar_stock', id=producto.id) }}" class="btn btn-sm btn-info">Agregar Stock</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

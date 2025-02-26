@@ -1,22 +1,36 @@
 {% extends 'index.html' %}
 
-{% block contenido %}
+{% block content %}
     <h1>Editar Producto</h1>
-    <form action="" method="post">
-        <label for="nombre">Nombre:</label><br>
-        <input type="text" id="nombre" name="nombre" value="{{ producto.nombre }}" required><br>
-        <label for="categoria">Categoría:</label><br>
-        <input type="text" id="categoria" name="categoria" value="{{ producto.categoria }}" required><br>
-        <label for="precio_compra">Precio de Compra:</label><br>
-        <input type="number" step="any" id="precio_compra" name="precio_compra" value="{{ producto.precio_compra }}" required><br>
-        <label for="precio_venta">Precio de Venta:</label><br>
-        <input type="number" step="any" id="precio_venta" name="precio_venta" value="{{ producto.precio_venta }}" required><br>
-        <label for="stock_disponible">Stock Disponible:</label><br>
-        <input type="number" id="stock_disponible" name="stock_disponible" value="{{ producto.stock_disponible }}" required><br>
-        <label for="proveedor">Proveedor:</label><br>
-        <input type="text" id="proveedor" name="proveedor" value="{{ producto.proveedor }}" required><br>
-        <label for="umbral_alerta">Umbral de Alerta:</label><br>
-        <input type="number" id="umbral_alerta" name="umbral_alerta" value="{{ producto.umbral_alerta }}" required><br>
-        <input type="submit" value="Guardar Cambios">
+    <form method="post" class="mt-3">
+        <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ producto.nombre }}" required>
+        </div>
+        <div class="form-group">
+            <label for="categoria">Categoría:</label>
+            <input type="text" class="form-control" id="categoria" name="categoria" value="{{ producto.categoria }}" required>
+        </div>
+        <div class="form-group">
+            <label for="precio_compra">Precio de Compra:</label>
+            <input type="number" step="any" class="form-control" id="precio_compra" name="precio_compra" value="{{ producto.precio_compra }}" required>
+        </div>
+        <div class="form-group">
+            <label for="precio_venta">Precio de Venta:</label>
+            <input type="number" step="any" class="form-control" id="precio_venta" name="precio_venta" value="{{ producto.precio_venta }}" required>
+        </div>
+        <div class="form-group">
+            <label for="stock_disponible">Stock Disponible:</label>
+            <input type="number" class="form-control" id="stock_disponible" name="stock_disponible" value="{{ producto.stock_disponible }}" required>
+        </div>
+        <div class="form-group">
+            <label for="proveedor">Proveedor:</label>
+            <input type="text" class="form-control" id="proveedor" name="proveedor" value="{{ producto.proveedor }}" required>
+        </div>
+         <div class="form-group">
+            <label for="umbral_alerta">Umbral de Alerta:</label>
+            <input type="number" class="form-control" id="umbral_alerta" name="umbral_alerta" value="{{ producto.umbral_alerta }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     </form>
 {% endblock %}

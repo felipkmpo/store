@@ -34,8 +34,15 @@ class Venta(db.Model):
 def index():
     return render_template('index.html')
 
-@app.route('/productos', methods=['GET', 'POST'])
+@app.route('/productos')
 def productos():
+    productos = Producto.query.all()
+    return render_template('productos/lista_productos.html', productos=productos)
+
+
+
+@app.route('/productos/agregar', methods=['GET', 'POST'])
+def agregar_producto():
     if request.method == 'POST':
         nuevo_producto = Producto(
             nombre=request.form['nombre'],
@@ -43,15 +50,16 @@ def productos():
             precio_compra=float(request.form['precio_compra']),
             precio_venta=float(request.form['precio_venta']),
             stock_disponible=int(request.form['stock_disponible']),
-            proveedor=request.form['proveedor']
+            proveedor=request.form['proveedor'],
+            umbral_alerta=int(request.form['umbral_alerta'])
         )
         db.session.add(nuevo_producto)
         db.session.commit()
-        return redirect(url_for('productos'))
-    productos = Producto.query.all()
-    return render_template('productos.html', productos=productos)
+        return redirect(url_for('productos'))  # Redirige a la lista de productos
+    return render_template('productos/agregar_producto.html')
 
 @app.route('/movimientos', methods=['GET', 'POST'])
+
 def movimientos():
     if request.method == 'POST':
         nuevo_movimiento = MovimientoInventario(
