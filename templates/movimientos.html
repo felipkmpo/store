@@ -1,0 +1,23 @@
+{% extends 'index.html' %}
+
+{% block contenido %}
+    <h1>Movimientos de Inventario</h1>
+    <form action="" method="post">
+        <label for="producto_id">ID del Producto:</label><br>
+        <input type="number" id="producto_id" name="producto_id" required><br>
+        <label for="tipo_movimiento">Tipo de Movimiento:</label><br>
+        <select id="tipo_movimiento" name="tipo_movimiento">
+            <option value="entrada">Entrada</option>
+            <option value="salida">Salida</option>
+        </select><br>
+        <label for="cantidad">Cantidad:</label><br>
+        <input type="number" id="cantidad" name="cantidad" required><br>
+        <input type="submit" value="Registrar Movimiento">
+    </form>
+    <h2>Historial de Movimientos</h2>
+    <ul>
+    {% for movimiento in movimientos %}
+        <li>Producto ID: {{ movimiento.producto_id }} - Tipo: {{ movimiento.tipo_movimiento }} - Cantidad: {{ movimiento.cantidad }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

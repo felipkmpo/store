@@ -1,0 +1,32 @@
+{% extends 'index.html' %}
+
+{% block contenido %}
+    <h1>Ganancias</h1>
+    <h2>Ganancias por Producto</h2>
+    <ul>
+    {% for producto, ganancia in ganancias_por_producto.items() %}
+        <li>{{ producto }}: {{ ganancia }}</li>
+    {% endfor %}
+    </ul>
+    
+    <h2>Ganancias Diarias</h2>
+    <ul>
+    {% for fecha, ganancia in ganancias_diarias.items() %}
+        <li>{{ fecha }}: {{ ganancia }}</li>
+    {% endfor %}
+    </ul>
+    
+    <h2>Ganancias Semanales</h2>
+    <ul>
+    {% for semana, ganancia in ganancias_semanales.items() %}
+        <li>{{ semana }}: {{ ganancia }}</li>
+    {% endfor %}
+    </ul>
+    
+    <h2>Ganancias Mensuales</h2>
+    <ul>
+    {% for mes, ganancia in ganancias_mensuales.items() %}
+        <li>{{ mes }}: {{ ganancia }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

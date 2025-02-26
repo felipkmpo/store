@@ -1,0 +1,22 @@
+{% extends 'index.html' %}
+
+{% block contenido %}
+    <h1>Ventas</h1>
+    <form action="" method="post">
+        <label for="producto_id">Seleccione el Producto:</label><br>
+        <select id="producto_id" name="producto_id">
+            {% for producto in productos %}
+                <option value="{{ producto.id }}">{{ producto.nombre }} (Stock: {{ producto.stock_disponible }})</option>
+            {% endfor %}
+        </select><br>
+        <label for="cantidad_vendida">Cantidad Vendida:</label><br>
+        <input type="number" id="cantidad_vendida" name="cantidad_vendida" required><br>
+        <input type="submit" value="Registrar Venta">
+    </form>
+    <h2>Historial de Ventas</h2>
+    <ul>
+    {% for venta in ventas %}
+        <li>Producto ID: {{ venta.producto_id }} - Cantidad Vendida: {{ venta.cantidad_vendida }} - Fecha: {{ venta.fecha_venta }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

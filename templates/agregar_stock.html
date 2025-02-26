@@ -1,0 +1,10 @@
+{% extends 'index.html' %}
+
+{% block contenido %}
+    <h1>Agregar Stock a {{ producto.nombre }}</h1>
+    <form action="" method="post">
+        <label for="cantidad_a_agregar">Cantidad a Agregar:</label><br>
+        <input type="number" id="cantidad_a_agregar" name="cantidad_a_agregar" required><br>
+        <input type="submit" value="Agregar Stock">
+    </form>
+{% endblock %}
