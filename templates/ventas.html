@@ -3,18 +3,23 @@
 {% block content %}
     <h1>Ventas</h1>
     <form method="post">
-        <div class="form-group">
-            <label for="producto_id">Seleccione el Producto</label>
-            <select class="form-control" id="producto_id" name="producto_id">
-                {% for producto in productos %}
-                    <option value="{{ producto.id }}">{{ producto.nombre }} (Stock: {{ producto.stock_disponible }})</option>
-                {% endfor %}
-            </select>
+        <div id="productos-container">
+            <div class="producto">
+                <div class="form-group">
+                    <label for="producto_id_0">Seleccione el Producto</label>
+                    <select class="form-control" id="producto_id_0" name="producto_id">
+                        {% for producto in productos %}
+                            <option value="{{ producto.id }}">{{ producto.nombre }} (Stock: {{ producto.stock_disponible }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cantidad_vendida_0">Cantidad Vendida</label>
+                    <input type="number" class="form-control" id="cantidad_vendida_0" name="cantidad_vendida" required>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="cantidad_vendida">Cantidad Vendida</label>
-            <input type="number" class="form-control" id="cantidad_vendida" name="cantidad_vendida" required>
-        </div>
+        <button type="button" id="add-producto" class="btn btn-secondary">Agregar Otro Producto</button>
         <button type="submit" class="btn btn-primary">Registrar Venta</button>
     </form>
 
@@ -23,10 +28,41 @@
         {% for venta in ventas %}
             <li class="list-group-item">
                 ID Venta: {{ venta.id }} - 
-                Producto: {{ venta.producto.nombre }} -
+                Producto: {{ venta.producto_nombre }} -
                 Cantidad Vendida: {{ venta.cantidad_vendida }} - 
                 Fecha: {{ venta.fecha_venta }}
             </li>
         {% endfor %}
     </ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addProductoButton = document.getElementById('add-producto');
+            const productosContainer = document.getElementById('productos-container');
+            let productoCount = 1;
+
+            addProductoButton.addEventListener('click', function() {
+                const newProductoDiv = document.createElement('div');
+                newProductoDiv.classList.add('producto');
+
+                newProductoDiv.innerHTML = `
+                    <div class="form-group">
+                        <label for="producto_id_${productoCount}">Seleccione el Producto</label>
+                        <select class="form-control" id="producto_id_${productoCount}" name="producto_id">
+                            {% for producto in productos %}
+                                <option value="{{ producto.id }}">{{ producto.nombre }} (Stock: {{ producto.stock_disponible }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidad_vendida_${productoCount}">Cantidad Vendida</label>
+                        <input type="number" class="form-control" id="cantidad_vendida_${productoCount}" name="cantidad_vendida" required>
+                    </div>
+                `;
+
+                productosContainer.appendChild(newProductoDiv);
+                productoCount++;
+            });
+        });
+    </script>
 {% endblock %}
