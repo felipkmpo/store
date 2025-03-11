@@ -157,12 +157,15 @@ def ventas():
     for venta in ventas:
         producto = Producto.query.get(venta.producto_id)
         total_venta = venta.precio_venta_unitario * venta.cantidad_vendida
+        ganancia_venta = (venta.precio_venta_unitario - producto.precio_compra) * venta.cantidad_vendida if producto else 0 # Cálculo de ganancia
+
         ventas_con_producto.append({
             'id': venta.id,
             'producto_nombre': producto.nombre if producto else "Producto eliminado",
             'cantidad_vendida': venta.cantidad_vendida,
             'fecha_venta': venta.fecha_venta,
-            'total_venta': total_venta  # Nuevo campo
+            'total_venta': total_venta,  # Nuevo campo
+            'ganancia_venta': ganancia_venta  #Nuevo campo
         })
 
     return render_template('ventas2.html', productos=productos, ventas=ventas_con_producto)
