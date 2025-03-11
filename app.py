@@ -116,13 +116,16 @@ def ventas():
     if request.method == 'POST':
         productos_ids = request.form.getlist('producto_id')
         cantidades_vendidas = request.form.getlist('cantidad_vendida')
+        dinero_recibido = float(request.form['dinero_recibido'])
 
+        total_venta = 0
         for producto_id, cantidad_vendida in zip(productos_ids, cantidades_vendidas):
             producto_id = int(producto_id)
             cantidad_vendida = int(cantidad_vendida)
             producto = Producto.query.get(producto_id)
 
-            if producto.stock_disponible >= cantidad_vendida:
+            if producto and producto.stock_disponible >= cantidad_vendida:
+                total_venta += producto.precio_venta * cantidad_vendida
                 nueva_venta = Venta(
                     producto_id=producto_id,
                     cantidad_vendida=cantidad_vendida,
@@ -130,7 +133,6 @@ def ventas():
                 )
                 db.session.add(nueva_venta)
 
-                # Registrar movimiento de inventario (salida)
                 nuevo_movimiento = MovimientoInventario(
                     producto_id=producto_id,
                     tipo_movimiento='salida',
@@ -139,30 +141,32 @@ def ventas():
                 )
                 db.session.add(nuevo_movimiento)
 
-                # Actualizar stock del producto
                 producto.stock_disponible -= cantidad_vendida
             else:
                 return f"No hay suficiente stock para el producto: {producto.nombre}."
 
         db.session.commit()
-        return redirect(url_for('ventas'))
+        devuelta = dinero_recibido - total_venta
+        return render_template('resumen_venta.html', total_venta=total_venta, dinero_recibido=dinero_recibido, devuelta=devuelta)
 
     productos = Producto.query.all()
     ventas = Venta.query.all()
-    
-    # Para mostrar el nombre del producto en el historial
+
+    # Incluir el nombre del producto y el total de la venta en la lista de ventas
     ventas_con_producto = []
     for venta in ventas:
         producto = Producto.query.get(venta.producto_id)
-        venta_con_producto = {
+        total_venta = venta.precio_venta_unitario * venta.cantidad_vendida
+        ventas_con_producto.append({
             'id': venta.id,
-            'producto_nombre': producto.nombre,
+            'producto_nombre': producto.nombre if producto else "Producto eliminado",
             'cantidad_vendida': venta.cantidad_vendida,
-            'fecha_venta': venta.fecha_venta
-        }
-        ventas_con_producto.append(venta_con_producto)
-    
-    return render_template('ventas.html', productos=productos, ventas=ventas_con_producto)
+            'fecha_venta': venta.fecha_venta,
+            'total_venta': total_venta  # Nuevo campo
+        })
+
+    return render_template('ventas2.html', productos=productos, ventas=ventas_con_producto)
+
 
 
 '''@app.route('/ganancias')
@@ -216,45 +220,48 @@ def ganancias():
 '''
 @app.route('/ganancias', methods=['GET'])
 def ganancias():
-    fecha_str = request.args.get('fecha')  # Obtener la fecha del query string
-    
-    if fecha_str:
-        try:
-            fecha_seleccionada = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-        except ValueError:
-            fecha_seleccionada = datetime.now().date()  # Si el formato es incorrecto, usa la fecha actual
-    else:
-        fecha_seleccionada = datetime.now().date()  # Si no se proporciona fecha, usa la fecha actual
+    fecha_str = request.args.get('fecha')
+    fecha_seleccionada = datetime.strptime(fecha_str, '%Y-%m-%d').date() if fecha_str else datetime.now().date()
     
     productos = Producto.query.all()
     ventas = Venta.query.all()
     
     # Cálculo de ganancias por producto
     ganancias_por_producto = {}
+
     for producto in productos:
-        ganancia_total = 0
-        for venta in ventas:
-            if venta.producto_id == producto.id:
-                ganancia_total += (venta.precio_venta_unitario - producto.precio_compra) * venta.cantidad_vendida
-        ganancias_por_producto[producto.nombre] = ganancia_total
+        cantidad_total = sum(venta.cantidad_vendida for venta in ventas if venta.producto_id == producto.id)
+        ganancia_total = sum(
+            (venta.precio_venta_unitario - producto.precio_compra) * venta.cantidad_vendida
+            for venta in ventas if venta.producto_id == producto.id
+        )
+        ganancias_por_producto[producto.nombre] = {
+            "cantidad_vendida": cantidad_total,
+            "ganancia": ganancia_total
+        }
     
-    # Cálculo de ganancias para la fecha seleccionada
+    # Cálculo de ganancias diarias corregido
     ganancias_diarias = {}
-    ganancia_del_dia = 0
     for venta in ventas:
-        if venta.fecha_venta.date() == fecha_seleccionada:
+        try:
+            fecha_venta = datetime.strptime(venta.fecha_venta, "%Y-%m-%d %H:%M:%S").date()  # Convertir a objeto datetime
+        except TypeError:
+            fecha_venta = venta.fecha_venta.date()  # Si ya es datetime, tomar solo la fecha
+        
+        if fecha_venta == fecha_seleccionada:
             producto = Producto.query.get(venta.producto_id)
-            ganancia_del_dia += (venta.precio_venta_unitario - producto.precio_compra) * venta.cantidad_vendida
-    ganancias_diarias[fecha_seleccionada.strftime('%Y-%m-%d')] = ganancia_del_dia
-    
+            if producto:
+                ganancia = (venta.precio_venta_unitario - producto.precio_compra) * venta.cantidad_vendida
+                ganancias_diarias[fecha_seleccionada.strftime('%Y-%m-%d')] = ganancias_diarias.get(fecha_seleccionada.strftime('%Y-%m-%d'), 0) + ganancia
+
     # Cálculo de ganancias semanales y mensuales (sin cambios)
     ganancias_semanales = {}
     ganancias_mensuales = {}
-    
+
     hoy = datetime.now()
     semana_pasada = hoy - timedelta(days=7)
     mes_pasado = hoy - timedelta(days=30)
-    
+
     for venta in ventas:
         fecha_venta = venta.fecha_venta
         if fecha_venta > semana_pasada:
@@ -269,9 +276,14 @@ def ganancias():
             producto = Producto.query.get(venta.producto_id)
             ganancias_mensuales[fecha_venta.strftime('%Y-%m')] += (venta.precio_venta_unitario - producto.precio_compra) * venta.cantidad_vendida
     
-    return render_template('ganancias.html', ganancias_por_producto=ganancias_por_producto,
-                           ganancias_diarias=ganancias_diarias, ganancias_semanales=ganancias_semanales,
-                           ganancias_mensuales=ganancias_mensuales, fecha_seleccionada=fecha_seleccionada)
+    return render_template(
+        'ganancias.html',
+        ganancias_por_producto=ganancias_por_producto,
+        ganancias_diarias=ganancias_diarias,
+        ganancias_semanales=ganancias_semanales,
+        ganancias_mensuales=ganancias_mensuales,
+        fecha_seleccionada=fecha_seleccionada
+    )
 
 
 @app.route('/editar_producto/<int:id>', methods=['GET', 'POST'])

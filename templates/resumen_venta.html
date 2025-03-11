@@ -1,0 +1,27 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <h1>Resumen de Venta</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Total de la Venta</h5>
+            <p class="card-text">${{ total_venta }}</p>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Dinero Recibido</h5>
+            <p class="card-text">${{ dinero_recibido }}</p>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Devuelta al Cliente</h5>
+            <p class="card-text">${{ devuelta }}</p>
+        </div>
+    </div>
+
+    <a href="{{ url_for('ventas') }}" class="btn btn-primary mt-3">Registrar otra Venta</a>
+{% endblock %}

@@ -1,32 +1,114 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <h1>Ventas</h1>
-    <form method="post">
-        <div class="form-group">
-            <label for="producto_id">Seleccione el Producto</label>
-            <select class="form-control" id="producto_id" name="producto_id">
-                {% for producto in productos %}
-                    <option value="{{ producto.id }}">{{ producto.nombre }} (Stock: {{ producto.stock_disponible }})</option>
-                {% endfor %}
-            </select>
+    <h1>Registrar Ventas</h1>
+    <form method="post" onsubmit="return validarDineroRecibido()">
+        <div id="productos-container">
+            <div class="producto">
+                <div class="form-group">
+                    <label for="producto_id_0">Seleccione el Producto</label>
+                    <select class="form-control" id="producto_id_0" name="producto_id" onchange="actualizarTotalVenta()">
+                        {% for producto in productos %}
+                            <option value="{{ producto.id }}" data-precio="{{ producto.precio_venta }}">
+                                {{ producto.nombre }} (Stock: {{ producto.stock_disponible }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cantidad_vendida_0">Cantidad Vendida</label>
+                    <input type="number" class="form-control" id="cantidad_vendida_0" name="cantidad_vendida" required oninput="actualizarTotalVenta()">
+                </div>
+            </div>
         </div>
+        <button type="button" id="add-producto" class="btn btn-secondary">Agregar Otro Producto</button>
         <div class="form-group">
-            <label for="cantidad_vendida">Cantidad Vendida</label>
-            <input type="number" class="form-control" id="cantidad_vendida" name="cantidad_vendida" required>
+            <label for="dinero_recibido">Dinero Recibido</label>
+            <input type="number" class="form-control" id="dinero_recibido" name="dinero_recibido" step="0.01" required oninput="validarDineroRecibido()">
         </div>
+        <p><strong>Total Venta:</strong> $<span id="total_venta">0.00</span></p>
         <button type="submit" class="btn btn-primary">Registrar Venta</button>
     </form>
 
     <h2>Historial de Ventas</h2>
     <ul class="list-group">
-        {% for venta in ventas %}
-            <li class="list-group-item">
-                ID Venta: {{ venta.id }} - 
-                Producto: {{ venta.producto_nombre }} -
-                Cantidad Vendida: {{ venta.cantidad_vendida }} - 
-                Fecha: {{ venta.fecha_venta }}
-            </li>
-        {% endfor %}
+        {% if ventas %}
+            {% for venta in ventas %}
+                <li class="list-group-item">
+                    <strong>ID Venta:</strong> {{ venta.id }} - 
+                    <strong>Producto:</strong> {{ venta.producto_nombre }} - 
+                    <strong>Cantidad Vendida:</strong> {{ venta.cantidad_vendida }} - 
+                    <strong>Total Venta:</strong> ${{ venta.total_venta }} - 
+                    <strong>Fecha:</strong> {{ venta.fecha_venta }}
+                </li>
+            {% endfor %}
+        {% else %}
+            <li class="list-group-item">No hay ventas registradas.</li>
+        {% endif %}
     </ul>
+
+    <script>
+        function actualizarTotalVenta() {
+            let totalVenta = 0;
+            document.querySelectorAll("[name='producto_id']").forEach((select, index) => {
+                let cantidad = parseInt(document.querySelectorAll("[name='cantidad_vendida']")[index].value) || 0;
+                let precio = parseFloat(select.options[select.selectedIndex].getAttribute("data-precio")) || 0;
+                totalVenta += precio * cantidad;
+            });
+            document.getElementById("total_venta").textContent = totalVenta.toFixed(2);
+            validarDineroRecibido();
+        }
+
+        function validarDineroRecibido() {
+            let totalVenta = parseFloat(document.getElementById("total_venta").textContent) || 0;
+            let dineroRecibido = parseFloat(document.getElementById("dinero_recibido").value) || 0;
+            if (dineroRecibido < totalVenta) {
+                document.getElementById("dinero_recibido").setCustomValidity("El dinero recibido no puede ser menor al total de la venta.");
+            } else {
+                document.getElementById("dinero_recibido").setCustomValidity("");
+            }
+            return dineroRecibido >= totalVenta;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const addProductoButton = document.getElementById('add-producto');
+            const productosContainer = document.getElementById('productos-container');
+            let productoCount = 1;
+    
+            addProductoButton.addEventListener('click', function() {
+                const newProductoDiv = document.createElement('div');
+                newProductoDiv.classList.add('producto');
+                newProductoDiv.setAttribute('id', `producto_${productoCount}`);
+    
+                newProductoDiv.innerHTML = `
+                    <div class="form-group">
+                        <label for="producto_id_${productoCount}">Seleccione el Producto</label>
+                        <select class="form-control" id="producto_id_${productoCount}" name="producto_id" onchange="actualizarTotalVenta()">
+                            {% for producto in productos %}
+                                <option value="{{ producto.id }}" data-precio="{{ producto.precio_venta }}">
+                                    {{ producto.nombre }} (Stock: {{ producto.stock_disponible }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidad_vendida_${productoCount}">Cantidad Vendida</label>
+                        <input type="number" class="form-control" id="cantidad_vendida_${productoCount}" name="cantidad_vendida" required oninput="actualizarTotalVenta()">
+                    </div>
+                    <button type="button" class="btn btn-danger remove-producto" data-id="producto_${productoCount}">Eliminar</button>
+                `;
+    
+                productosContainer.appendChild(newProductoDiv);
+                productoCount++;
+            });
+    
+            productosContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-producto')) {
+                    const productoId = event.target.getAttribute('data-id');
+                    document.getElementById(productoId).remove();
+                    actualizarTotalVenta();
+                }
+            });
+        });
+    </script>
 {% endblock %}

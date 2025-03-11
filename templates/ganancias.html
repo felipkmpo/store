@@ -8,6 +8,7 @@
         <thead>
             <tr>
                 <th>Producto</th>
+                <th>Cantidad Vendida</th>
                 <th>Ganancia</th>
             </tr>
         </thead>
@@ -15,21 +16,14 @@
             {% for producto, ganancia in ganancias_por_producto.items() %}
                 <tr>
                     <td>{{ producto }}</td>
+                    <td>{{ cantidad_vendida }}</td>
                     <td>{{ ganancia }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <h2>Ganancias Diarias</h2>
-    <form method="GET" action="{{ url_for('ganancias') }}">
-        <div class="form-group">
-            <label for="fecha">Seleccione una fecha:</label>
-            <input type="date" class="form-control" id="fecha" name="fecha">
-        </div>
-        <button type="submit" class="btn btn-primary">Mostrar Ganancias del Día</button>
-    </form>
-
+    <h2>Ganancias del Día</h2>
     {% if ganancias_diarias %}
         <table class="table table-striped">
             <thead>
@@ -47,6 +41,8 @@
                 {% endfor %}
             </tbody>
         </table>
+    {% else %}
+        <p class="text-warning">No hay registros de ganancias para hoy.</p>
     {% endif %}
 
     <h2>Ganancias Semanales</h2>
