@@ -13,11 +13,11 @@
             </tr>
         </thead>
         <tbody>
-            {% for producto, ganancia in ganancias_por_producto.items() %}
+            {% for producto, datos in ganancias_por_producto.items() %}
                 <tr>
                     <td>{{ producto }}</td>
-                    <td>{{ cantidad_vendida }}</td>
-                    <td>{{ ganancia }}</td>
+                    <td>{{ datos.cantidad_vendida }}</td>
+                    <td>{{ datos.ganancia }}</td>
                 </tr>
             {% endfor %}
         </tbody>
